@@ -44,7 +44,7 @@ create table public.scanners (
   name text not null check (length(trim(name)) between 1 and 100),
   description text check (description is null or length(description) <= 1000),
   type text not null default 'neutral' check (type in ('reward', 'penalty', 'clue', 'decoy', 'neutral')),
-  points integer not null default 5 check (points between 0 and 1000),
+  points integer not null default 1 check (points between 0 and 1000),
   destination_url text not null check (length(destination_url) <= 2048),
   destination_type text not null default 'internal' check (destination_type in ('internal', 'external')),
   active boolean not null default true,
