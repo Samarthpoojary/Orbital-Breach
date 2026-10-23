@@ -6,3 +6,6 @@ verify_jwt = false
 [functions.team-login]
 verify_jwt = false
 
+[functions.team-register]
+verify_jwt = false
+
