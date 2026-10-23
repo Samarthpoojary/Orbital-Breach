@@ -1,0 +1,8 @@
+project_id = "orbital-breach"
+
+[functions.bootstrap-admin]
+verify_jwt = false
+
+[functions.team-login]
+verify_jwt = false
+
