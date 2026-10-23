@@ -123,7 +123,7 @@ function downloadCsv(filename: string, rows: Array<Array<string | number>>) {
   };
   const content = `\uFEFF${rows.map(row => row.map(csvCell).join(',')).join('\r\n')}`;
   const url = URL.createObjectURL(new Blob([content], { type: 'text/csv;charset=utf-8' }));
-  const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); URL.revokeObjectURL(url);
+  const anchor = document.createElement('a'); anchor.href = url; anchor.download = filename; anchor.click(); window.setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 function BootstrapCard({ flash, onDone }: { flash: (n: Notice) => void; onDone: () => void }) {
