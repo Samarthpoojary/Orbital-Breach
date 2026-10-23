@@ -14,7 +14,7 @@ Without Supabase credentials, the app opens in a designed preview mode. Real reg
 ## Supabase setup
 
 1. Create a Supabase project, add the deployed HTTPS origin to Auth's allowed redirect URLs, and configure email confirmations with a working SMTP provider. The primary operator email must be confirmed before the team profile can be completed. Both operators can sign in with either registered email and the shared crew password.
-2. Apply `supabase/migrations/0001_orbital_breach.sql` using the Supabase SQL editor or `supabase db push` after linking the project.
+2. Apply `supabase/migrations/0001_orbital_breach.sql` using the Supabase SQL editor or `supabase db push` after linking the project. Then apply `supabase/migrations/0002_scan_claim_feedback.sql`; it adds clear claim messages and seeds the eight supplied field locations as one-point stations.
 3. Deploy the bootstrap function and set a long, random one time setup code:
 
    ```sh
@@ -25,7 +25,7 @@ Without Supabase credentials, the app opens in a designed preview mode. Real reg
 
 4. Copy `.env.example` to `.env.local` and set the project URL and anon key. Never put the service role key in a `VITE_` variable or browser code.
 5. Start the app, open `/admin/bootstrap`, and create the first administrator with the setup code. Then remove `ADMIN_SETUP_CODE` and undeploy `bootstrap-admin`. The database function permits only the first administrator, even if multiple setup requests race.
-6. Sign in as the administrator. Create one scanner per QR marker. Use an internal path such as `/` or an HTTPS destination. Encode `https://<your-domain>/scan/<slug>` in the physical QR code. Use a random, unguessable slug for each deployed marker.
+6. Deploy the web app to a public HTTPS domain before producing physical QR codes. The second migration seeds these locations: Round 1 Fake QR — Mess Ground, Sports Complex, PJ Ground — Actual QR, Star Chart — Mech Parking, and Stations 1–4. Each awards one point once per team. Sign in as administrator and use **COPY QR LINK** beside each station to get its URL, then create the QR image from that URL. Never print a localhost URL.
 
 The included Vercel and Netlify rewrite files route `/scan/<slug>` and `/admin/bootstrap` to the React app on direct visits.
 
@@ -37,6 +37,7 @@ For a college email allowlist, set `event_settings.allowed_email_domains` to the
 - Registration has unique constraints for normalized team names and both participant email addresses. The secondary operator can authenticate through a server-only email alias lookup, but the endpoint returns only a session after password verification; it never returns the primary email or whether an address belongs to a crew.
 - Teams can read only their own team profile. Participant roles cannot read scanner configuration, claims, interaction details, audit records, or the score ledger. Participant activity returns generic labels, and the UI never requests the score.
 - `resolve_scan()` derives the team from the Auth session. A unique `(team_id, scanner_id)` claim key and `INSERT ... ON CONFLICT` make concurrent scans single-use. The claim, interaction, and score entry commit in one transaction.
+- The claim page displays `1 POINT CLAIMED` (or `ALREADY CLAIMED`) and waits for the participant to choose **RETURN TO ORBITAL BREACH**. It does not reveal their score. Admins can view the team, station, result, point delta, and server-recorded scan time in **Recent Field Scans**.
 - Reward signals add points, penalty signals subtract points, and clues, decoys, and neutral signals have a zero score delta. Repeatable scoring is deliberately unsupported so a reward cannot be farmed.
 - Admin RPCs check the signed-in Auth user against `admins`, record score/status/configuration actions in `audit_logs`, and are protected by RLS. The service role exists only in Supabase Edge Function secrets.
 - External scanner destinations must use HTTPS; internal destinations must begin with one `/`, preventing protocol-relative redirects. Treat external destinations as organizer-controlled content.
